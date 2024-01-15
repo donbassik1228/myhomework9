@@ -14,6 +14,12 @@ def input_error(func):
 
 @input_error
 def add_contact(name, phone):
+    if name in contacts:
+        raise ValueError("Contact already exists. Use 'change' command to update the phone number.")
+    
+    if not phone.isdigit():
+        raise ValueError("Phone must be a numeric value.")
+    
     contacts[name] = phone
     return f"Contact {name} added successfully"
 
@@ -39,43 +45,28 @@ def show_all_contacts():
 def main():
     print("How can I help you?")
 
+    commands = {
+        "hello": lambda: print("How can I help you?"),
+        "add": lambda args: add_contact(*args),
+        "change": lambda args: change_phone(*args),
+        "phone": lambda args: get_phone(*args),
+        "show all": lambda: print(show_all_contacts()),
+        "good bye": lambda: print("Good bye!") or exit(),
+        "close": lambda: print("Good bye!") or exit(),
+        "exit": lambda: print("Good bye!") or exit(),
+    }
+
     while True:
         command = input("Enter a command: ").lower()
-        if command == "hello":
-            print("How can I help you?")
-        elif command.startswith("add"):
-            try:
-                _, name, phone = command.split()
-                response = add_contact(name, phone)
-            except ValueError:
-                response = "Invalid command format"
+        try:
+            command, *args = command.split()
+            response = commands.get(command, lambda: print("Invalid command. Please try again"))(args)
             print(response)
-        elif command.startswith("change"):
-            try:
-                _, name, phone = command.split()
-                response = change_phone(name, phone)
-            except ValueError:
-                response = "Invalid command format"
-            print(response)
-        elif command.startswith("phone"):
-            try:
-                _, name = command.split()
-                response = get_phone(name)
-            except ValueError:
-                response = "Invalid command format"
-            print(response)
-        elif command == "show all":
-            print(show_all_contacts())
-        elif command in ["good bye", "close", "exit"]:
-            print("Good bye!")
-            break
-        else:
-            print("Invalid command. Please try again")
+        except ValueError as e:
+            print(str(e))
 
 if __name__ == "__main__":
     main()
-
-
 
 
 
