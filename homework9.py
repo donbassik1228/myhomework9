@@ -1,3 +1,4 @@
+
 contacts = {}
 
 def input_error(func):
@@ -5,7 +6,7 @@ def input_error(func):
         try:
             return func(*args, **kwargs)
         except KeyError:
-            return "Enter a valid user name"
+            return "Enter a user name"
         except ValueError:
             return "Provide both name and phone, please"
         except IndexError:
@@ -16,10 +17,6 @@ def input_error(func):
 def add_contact(name, phone):
     if name in contacts:
         raise ValueError("Contact already exists. Use 'change' command to update the phone number.")
-    
-    if not phone.isdigit() or not phone:
-        raise ValueError("Phone must be a non-empty numeric value.")
-    
     contacts[name] = phone
     return f"Contact {name} added successfully"
 
@@ -33,37 +30,54 @@ def change_phone(name, phone):
 @input_error
 def get_phone(name):
     if name not in contacts:
-        return f"No phone number found for {name}"
+        raise KeyError
     return f"The phone number for {name} is {contacts[name]}"
 
 def show_all_contacts():
     if not contacts:
         return "No contacts available"
-    result = "\n".join([f"{name}: {contacts[name]}" for name in contacts])
+    result = "\n".join([f"{name}: {phone}" for name, phone in contacts.items()])
     return result
 
 def main():
     print("How can I help you?")
 
-    commands = {
-        "hello": lambda: print("How can I help you?"),
-        "add": lambda args: print(add_contact(*args)),
-        "change": lambda args: print(change_phone(*args)),
-        "phone": lambda args: print(get_phone(*args)),
-        "show all": lambda: print(show_all_contacts()),
-        "good bye": lambda: print("Good bye!") or exit(),
-        "close": lambda: print("Good bye!") or exit(),
-        "exit": lambda: print("Good bye!") or exit(),
-    }
-
-    while True:
-        command = input("Enter a command: ").lower()
+while True:
+    command = input("Enter a command: ").lower()
+    if command == "hello":
+        print("How can I help you?")
+    elif command.startswith("add"):
         try:
-            command, *args = command.split()
-            response = commands.get(command, lambda args: print("Invalid command. Please try again"))(args)
-            print(response)
-        except ValueError as e:
-            print(str(e))
+            _, name, phone = command.split(maxsplit=2)  
+            response = add_contact(name, phone)
+        except ValueError:
+            response = "Invalid command format"
+        print(response)
+    elif command.startswith("change"):
+        try:
+            _, name, phone = command.split(maxsplit=2)  
+            response = change_phone(name, phone)
+        except ValueError:
+            response = "Invalid command format"
+        print(response)
+    elif command.startswith("phone"):
+        try:
+            _, name = command.split(maxsplit=1)  
+            response = get_phone(name)
+        except ValueError:
+            response = "Invalid command format"
+        print(response)
+    elif command == "show all":
+        print(show_all_contacts())
+    elif command in ["good bye", "close", "exit"]:
+        print("Good bye!")
+        break
+    else:
+        print("Invalid command. Please try again")
 
 if __name__ == "__main__":
     main()
+
+
+
+
