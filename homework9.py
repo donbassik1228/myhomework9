@@ -37,7 +37,8 @@ def show_all_contacts():
 @input_error
 def change_phone(name, phone):
     if name not in contacts:
-        raise KeyError
+        raise ValueError(f"Contact '{name}' does not exist. Use 'add' command to add a new contact.")
+    
     contacts[name] = phone
     return f"Phone number for {name} updated successfully"
 
