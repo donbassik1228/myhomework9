@@ -53,12 +53,14 @@ def show_all_contacts():
     result = "\n".join([f"{name}: {phone}" for name, phone in contacts.items()])
     return result
 
+
+
 def main():
     while True:
         command = input("Enter a command: ").lower()
         if command == "hello":
             print("How can I help you?")
-        elif command.startswith("add"):
+        elif command.startswith("add "):
             try:
                 _, name, phone = command.split(maxsplit=2)
                 response = add_contact(name, phone)
